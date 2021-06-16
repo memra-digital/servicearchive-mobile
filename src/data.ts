@@ -3,6 +3,14 @@ import { Document } from './schemas';
 
 let data: Document[] = [];
 
+const loadData = async () => {
+	if (!(await FileSystem.getInfoAsync(`${FileSystem.documentDirectory}data.json`)).exists) {
+		FileSystem.writeAsStringAsync(`${FileSystem.documentDirectory}data.json`, `[]`);
+	}
+	data = JSON.parse(await FileSystem.readAsStringAsync(`${FileSystem.documentDirectory}data.json`));
+}
+loadData();
+
 export const documentExists = (title: string) => {
 	for (let i: number = 0; i < data.length; i++) {
 		if (data[i].title == title) {
@@ -37,7 +45,20 @@ export const getDocumentContent = (id: number) => {
 		}
 	}
 }
+export const findDocuments = (term: string) => {
+	let results: Document[] = [];
+	for (let i: number = 0; i < data.length; i++) {
+		if (data[i].title.includes(term)) {
+			results.push(data[i]);
+		}		
+	}
+	return results;
+}
 
+export const setData = (newData: Document[]) => {
+	data = [...newData];
+	save();
+}
 export const addDocument = (title: string) => {
 	if (documentExists(title)) {
 		return;
@@ -47,25 +68,33 @@ export const addDocument = (title: string) => {
 		return;
 	}
 
+	let newId: number = 0;
+	if (data.length > 0) {
+		newId = data[data.length - 1].id + 1;
+	}
+
 	data.push({
-		id: data[data.length - 1].id + 1,
+		id: newId,
 		title,
 		content: ``,
-		modified: 0,
-		created: 0
+		modified: Date.now(),
+		created: Date.now()
 	});
+
+	save();
 }
 export const setDocumentContent = (id: number, content: string) => {
 	for (let i: number = 0; i < data.length; i++) {
 		if (data[i].id == id) {
 			data[i].content = content;
+			data[i].modified = Date.now();
 			return true;
 		}
 	}
 	return false;
 }
 
-const autosave = () => {
-	
+const save = async () => {
+	FileSystem.writeAsStringAsync(`${FileSystem.documentDirectory}data.json`, JSON.stringify(getData()));
 }
-setTimeout(() => autosave(), 60000);
+setTimeout(() => save(), 60000);

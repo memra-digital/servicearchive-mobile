@@ -20,12 +20,7 @@ export default class App extends Component {
 						name="documents"
 						component={DocumentList}
 						options={{
-							title: `Dokumenti`,
-							headerStyle: {
-								backgroundColor: `#32323b`,
-								borderBottomWidth: 0
-							},
-							headerTintColor: `#ffffff`
+							headerShown: false
 						}} />
 					<Stack.Screen
 						name="editor"

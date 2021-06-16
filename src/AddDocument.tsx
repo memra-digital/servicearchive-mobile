@@ -27,7 +27,7 @@ export default function AddDocument({ navigation }: any) {
 				activeOpacity={0.5}
 				onPress={() => {
 					data.addDocument(newDocumentTitle);
-					navigation.navigate(`documents`);
+					navigation.navigate(`documents`, { refresh: true });
 				}}>
 				
 				<Text style={styles.buttonText}>Pievienot</Text>
